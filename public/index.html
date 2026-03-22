@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hairuus Dashboard - Previsibilidade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i data-lucide="trending-up" class="logo-icon"></i>
+                <span>HairuusStore</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i data-lucide="pie-chart"></i> Previsibilidade
+                </a>
+                <a href="#" class="nav-item">
+                    <i data-lucide="settings"></i> Configurações
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1 class="page-title">Painel de Previsibilidade</h1>
+                    <p class="subtitle">Análise Preditiva e Histórica de Faturamento</p>
+                </div>
+                <!-- Theme Toggle & Action -->
+                <div class="actions">
+                    <button class="btn btn-primary" id="refreshBtn">
+                        <i data-lucide="refresh-cw" id="refreshIcon"></i> Atualizar Dados
+                    </button>
+                    <button class="icon-btn" id="themeToggle" aria-label="Alternar Tema">
+                        <i data-lucide="sun" id="themeIcon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="filters-row">
+                <button class="filter-btn active" data-period="">Padrão</button>
+                <button class="filter-btn" data-period="Hoje">Hoje</button>
+                <button class="filter-btn" data-period="Ontem">Ontem</button>
+                <button class="filter-btn" data-period="7 dias">7 dias</button>
+                <button class="filter-btn" data-period="Este Mês">Este Mês</button>
+                <button class="filter-btn" data-period="Mês Passado">Mês Passado</button>
+                <button class="filter-btn" data-period="Geral">Geral</button>
+                
+                <input type="text" id="customDateRange" class="modern-input filter-btn" style="background:#1e1e1e; border:1px solid rgba(255,255,255,0.1); width: 220px; font-weight: 500;" placeholder="📅 INÍCIO ~ FIM" readonly>
+            </div>
+
+            <div id="loader" class="loader-container">
+                <div class="spinner"></div>
+                <h2>Analisando seus dados...</h2>
+                <p>Nossos algoritmos estão realizando o web scraping e calculando a previsão com regressão linear.</p>
+            </div>
+
+            <div id="dashboard" class="dashboard-content hidden">
+                <!-- Current Metrics -->
+                <section class="metrics-grid">
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Faturamento Atual</span>
+                            <div class="icon-wrapper green">
+                                <i data-lucide="dollar-sign"></i>
+                            </div>
+                        </div>
+                        <h2 class="metric-value" id="valFaturamento">R$ 0,00</h2>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Lucro Real</span>
+                            <div class="icon-wrapper purple">
+                                <i data-lucide="wallet"></i>
+                            </div>
+                        </div>
+                        <h2 class="metric-value" id="valLucro">R$ 0,00</h2>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Previsão (Próx. 14 dias)</span>
+                            <div class="icon-wrapper blue">
+                                <i data-lucide="trending-up"></i>
+                            </div>
+                        </div>
+                        <h2 class="metric-value" id="valPrevisto">R$ 0,00</h2>
+                        <span class="metric-change positive" id="valGrowth">
+                            +0% Crescimento
+                        </span>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Lucro Projetado (14D)</span>
+                            <div class="icon-wrapper orange">
+                                <i data-lucide="award"></i>
+                            </div>
+                        </div>
+                        <h2 class="metric-value" id="valLucroPrevisto">R$ 0,00</h2>
+                    </div>
+                </section>
+
+                <section class="charts-section">
+                    <div class="glass-card chart-container main-chart">
+                        <div class="chart-header">
+                            <h3>Curva de Crescimento e Previsão</h3>
+                            <div class="chart-actions">
+                                <select class="modern-select" id="predictionDays">
+                                    <option value="7">7 Dias</option>
+                                    <option value="14" selected>14 Dias</option>
+                                    <option value="30">1 Mês (30 Dias)</option>
+                                    <option value="60">2 Meses</option>
+                                    <option value="90">3 Meses</option>
+                                    <option value="180">6 Meses</option>
+                                    <option value="365">1 Ano</option>
+                                </select>
+                            </div>
+                        </div>
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="bottom-grid">
+                    <div class="glass-card top-products-card">
+                        <div class="card-header-styled">
+                            <h3><i data-lucide="shopping-bag"></i> Top Produtos (Mix de Vendas)</h3>
+                            <span class="badge">Ranking do Período</span>
+                        </div>
+                        <ul id="topProductsList" class="product-list">
+                            <!-- Items will be injected here -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
