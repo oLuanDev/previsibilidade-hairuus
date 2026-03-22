@@ -17,7 +17,10 @@ const URL = 'https://hairuus-store.vercel.app/';
 
 async function scrapeData(periodFilter, startDate, endDate) {
     console.log(`Starting Playwright for period: ${periodFilter || 'default'}...`);
-    const browser = await chromium.launch({ headless: true });
+    const browser = await chromium.launch({ 
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const context = await browser.newContext();
     const page = await context.newPage();
     
